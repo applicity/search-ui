@@ -131,6 +131,7 @@ export type SearchDriverOptions = {
   hasA11yNotifications?: boolean;
   a11yNotificationMessages?: Record<string, unknown>;
   alwaysSearchOnInitialLoad?: boolean;
+  neverSearchOnInitialLoad?: boolean;
 };
 
 export type SubscriptionHandler = (state: SearchState) => void;
@@ -158,6 +159,7 @@ class SearchDriver {
   trackUrlState: boolean;
   urlPushDebounceLength: number;
   alwaysSearchOnInitialLoad: boolean;
+  neverSearchOnInitialLoad: boolean;
   URLManager: URLManager;
   hasA11yNotifications: boolean;
   a11yNotificationMessages: Record<
@@ -183,7 +185,8 @@ class SearchDriver {
     urlPushDebounceLength = 500,
     hasA11yNotifications = false,
     a11yNotificationMessages = {},
-    alwaysSearchOnInitialLoad = false
+    alwaysSearchOnInitialLoad = false,
+    neverSearchOnInitialLoad = false,
   }: SearchDriverOptions) {
     this.actions = Object.entries(actions).reduce(
       (acc, [actionName, action]) => {
@@ -280,11 +283,11 @@ class SearchDriver {
     // We'll trigger an initial search if initial parameters contain
     // a search term or filters, or if alwaysSearchOnInitialLoad is set.
     // Otherwise, we'll just save their selections in state as initial values.
-    if (
+    if (!neverSearchOnInitialLoad && (
       searchParameters.searchTerm ||
       searchParameters.filters.length > 0 ||
       this.alwaysSearchOnInitialLoad
-    ) {
+    )) {
       this._updateSearchResults(searchParameters, { replaceUrl: true });
     }
   }
